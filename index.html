@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PortalBilet × Авито — Питч</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Onest:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --yellow: #FFD800;
+    --yellow-dark: #F5C800;
+    --red: #E63000;
+    --black: #0A0A0A;
+    --white: #FFFFFF;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  html, body {
+    font-family: 'Onest', sans-serif;
+    background: #0d0d0d;
+    color: var(--black);
+    overflow-x: hidden;
+  }
+
+  /* ─── SCROLL REVEAL ─── */
+  .reveal {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Fallback: show everything if JS fails or preview context */
+  @media (prefers-reduced-motion: no-preference) {}
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.22s; }
+  .reveal-delay-3 { transition-delay: 0.34s; }
+  .reveal-delay-4 { transition-delay: 0.46s; }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--black);
+    padding: 0 40px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #1a1a1a;
+  }
+  .nav-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    color: var(--yellow);
+    letter-spacing: -0.5px;
+  }
+  .nav-logo span { color: var(--white); }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: #777;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--yellow); }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    background: var(--yellow);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 80px 60px 60px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    margin: 8px;
+  }
+  .hero-avito-watermark {
+    position: absolute;
+    right: -5%;
+    bottom: -10%;
+    width: 52%;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+  }
+  .hero-avito-watermark svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .hero-left { position: relative; z-index: 2; }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--black);
+    color: var(--yellow);
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    margin-bottom: 28px;
+  }
+  .hero-tag-dot {
+    width: 6px; height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+
+  .hero-title {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: clamp(36px, 5vw, 68px);
+    line-height: 1.0;
+    letter-spacing: -2px;
+    color: var(--black);
+    margin-bottom: 12px;
+  }
+  .hero-title .accent { color: var(--red); }
+
+  .hero-sub {
+    font-size: 18px;
+    color: rgba(0,0,0,0.55);
+    font-weight: 500;
+    max-width: 420px;
+    line-height: 1.5;
+    margin-bottom: 40px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 0;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .hero-stat {
+    padding: 20px 28px;
+    background: var(--black);
+    color: var(--white);
+  }
+  .hero-stat:nth-child(2) { background: var(--red); }
+  .hero-stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--yellow);
+    line-height: 1;
+    display: block;
+  }
+  .hero-stat:nth-child(2) .hero-stat-num { color: var(--white); }
+  .hero-stat-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+    display: block;
+    max-width: 110px;
+    line-height: 1.3;
+  }
+
+  /* Hero right — search mockup */
+  .hero-right {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .search-box {
+    width: 100%;
+    max-width: 440px;
+    background: var(--white);
+    border-radius: 0;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 8px 8px 0 var(--black);
+  }
+  .search-icon {
+    width: 22px; height: 22px;
+    color: #aaa;
+    flex-shrink: 0;
+  }
+  .search-text {
+    font-size: 16px;
+    color: #888;
+    font-family: 'Onest', sans-serif;
+  }
+  .search-cursor {
+    width: 2px; height: 18px;
+    background: var(--black);
+    animation: blink 1s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  .ticket-stack {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    height: 160px;
+  }
+  .ticket {
+    position: absolute;
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .ticket:nth-child(1) { top: 0; background: var(--black); transform: rotate(-2deg); z-index: 1; }
+  .ticket:nth-child(2) { top: 24px; background: var(--red); transform: rotate(1deg); z-index: 2; }
+  .ticket:nth-child(3) { top: 12px; background: #1a1a1a; transform: rotate(-0.5deg); z-index: 3; box-shadow: 8px 8px 0 rgba(0,0,0,0.3); }
+  
+  .ticket-body {
+    flex: 1;
+    padding: 0 24px;
+  }
+  .ticket-name {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--yellow);
+  }
+  .ticket:nth-child(2) .ticket-name { color: var(--white); }
+  .ticket-date {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+  }
+  .ticket-stub {
+    width: 80px;
+    height: 100%;
+    border-left: 3px dashed rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ticket-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    color: rgba(255,255,255,0.3);
+  }
+  .ticket:nth-child(2) .ticket-logo { color: rgba(255,255,255,0.5); }
+
+  /* ─── PROBLEM SECTION ─── */
+  #problem {
+    background: var(--black);
+    padding: 100px 60px;
+    position: relative;
+    border-radius: 24px;
+    margin: 8px;
+  }
+  .section-label {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #222;
+  }
+  .section-title {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: clamp(28px, 4vw, 52px);
+    color: var(--white);
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    margin-bottom: 60px;
+  }
+  .section-title .yellow { color: var(--yellow); }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  .problem-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 20px;
+    padding: 44px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .problem-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 16px;
+    display: block;
+    color: var(--yellow);
+  }
+  .problem-card h3 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+  .problem-card p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+  }
+
+  /* ─── HOW IT WORKS ─── */
+  #how {
+    background: var(--yellow);
+    padding: 100px 60px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    margin: 8px;
+  }
+  #how .section-label { color: var(--black); }
+  #how .section-label::after { background: rgba(0,0,0,0.15); }
+  #how .section-title { color: var(--black); }
+  #how .section-title .yellow { color: var(--red); }
+
+  .how-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 60px;
+    align-items: start;
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 0;
+    position: relative;
+  }
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 31px;
+    top: 64px;
+    width: 2px;
+    height: calc(100% - 20px);
+    background: rgba(0,0,0,0.15);
+  }
+  .step-num {
+    width: 56px; height: 56px;
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--yellow);
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .step-content {
+    padding: 0 0 48px 24px;
+  }
+  .step-content h3 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .step-content p {
+    font-size: 15px;
+    color: rgba(0,0,0,0.55);
+    line-height: 1.6;
+    max-width: 420px;
+  }
+  .step-badge {
+    display: inline-block;
+    background: var(--black);
+    color: var(--yellow);
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Unbounded', sans-serif;
+    letter-spacing: 1px;
+    padding: 5px 12px;
+    margin-top: 10px;
+  }
+
+  /* Phone mockup */
+  .phone-wrap {
+    display: flex;
+    justify-content: center;
+    position: sticky;
+    top: 100px;
+  }
+  .phone {
+    width: 280px;
+    height: 560px;
+    background: #0A0A0A;
+    border-radius: 36px;
+    padding: 16px;
+    box-shadow: 
+      0 0 0 2px #222,
+      20px 20px 0 var(--black),
+      -8px -8px 0 rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .phone-notch {
+    width: 80px; height: 20px;
+    background: #0A0A0A;
+    border-radius: 0 0 14px 14px;
+    margin: 0 auto 8px;
+    position: relative;
+    z-index: 10;
+  }
+  .phone-screen {
+    background: var(--white);
+    height: calc(100% - 40px);
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .phone-header {
+    background: #0055CC;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .phone-header-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    color: white;
+  }
+  .phone-content {
+    flex: 1;
+    padding: 12px 16px 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .phone-event-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 4px;
+  }
+  .phone-event-meta {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 14px;
+  }
+  /* Widget */
+  .phone-widget {
+    background: var(--yellow);
+    border-radius: 0;
+    padding: 12px;
+    position: relative;
+  }
+  .widget-dots-top, .widget-dots-bot {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  .widget-dots-bot { margin-top: 8px; margin-bottom: 0; }
+  .w-dot {
+    width: 7px; height: 7px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 50%;
+  }
+  .widget-label {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--black);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .seats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .seat {
+    height: 18px;
+    border-radius: 2px;
+    background: var(--black);
+    transition: all 0.2s;
+  }
+  .seat.selected { background: var(--red); }
+  .seat.taken { background: #bbb; }
+  .buy-btn {
+    background: var(--red);
+    color: white;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    text-align: center;
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  /* ─── VALUE SECTION ─── */
+  #value {
+    background: var(--black);
+    padding: 100px 60px;
+    border-radius: 24px;
+    margin: 8px;
+  }
+  .value-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-top: 0;
+  }
+  .value-card {
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 20px;
+  }
+  .vc-top {
+    padding: 40px 36px 32px;
+    flex: 1;
+    background: transparent;
+  }
+  .vc-icon {
+    font-size: 40px;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .vc-label {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .vc-label { color: var(--yellow); }
+  .vc-big {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 72px;
+    font-weight: 900;
+    line-height: 0.9;
+    margin-bottom: 20px;
+    letter-spacing: -3px;
+    display: block;
+  }
+  .vc-big { color: var(--yellow); }
+  .vc-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .vc-title { color: var(--white); }
+  .vc-points {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .vc-points li {
+    font-size: 13px;
+    line-height: 1.6;
+    padding-left: 16px;
+    position: relative;
+    color: #666;
+  }
+  .vc-points li { color: #666; }
+  .vc-points li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: #444;
+  }
+
+  .vc-bottom {
+    padding: 20px 32px;
+    border-top: 1px solid #222;
+  }
+
+  .vc-bottom span {
+    font-size: 12px;
+    color: #555;
+    font-style: italic;
+  }
+
+
+  /* ─── NUMBERS SECTION ─── */
+  #numbers {
+    background: var(--yellow);
+    padding: 100px 60px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    margin: 8px;
+  }
+  #numbers .section-label { color: var(--black); }
+  #numbers .section-label::after { background: rgba(0,0,0,0.15); }
+  #numbers .section-title { color: var(--black); }
+
+  .market-size {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+  .market-big {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 40px;
+}
+  .market-label {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .market-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(40px, 6vw, 80px);
+    font-weight: 900;
+    color: var(--yellow);
+    letter-spacing: -3px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .market-sub {
+    font-size: 14px;
+    color: #666;
+  }
+  .market-context {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 40px;
+}
+  .market-context .market-num { color: var(--yellow); }
+  .market-context .market-label { color: rgba(255,255,255,0.5); }
+  .market-context .market-sub { color: rgba(255,255,255,0.5); }
+
+  /* Year bars */
+  .years-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 2px;
+  }
+  .year-card {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 32px;
+  flex: 1;
+  position: relative;
+}
+    .year-card:nth-child(2) { background: #111; }
+  .year-card:nth-child(3) { background: #111; }
+  .year-card:nth-child(4) { background: #111; border: 1px solid var(--yellow); }
+  .year-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 12px;
+  }
+  .year-card:nth-child(4) .year-label { color: rgba(255,215,0,0.6); }
+  .year-share {
+    font-size: 38px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 10px;
+    letter-spacing: -1px;
+  }
+  .year-card:nth-child(1) .year-share { color: rgba(255,255,255,0.5); }
+  .year-card:nth-child(2) .year-share { color: var(--white); }
+  .year-card:nth-child(3) .year-share { color: var(--white); }
+  .year-card:nth-child(4) .year-share { color: var(--yellow); }
+  .year-rev {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+  .year-card:nth-child(4) .year-rev { color: rgba(255,215,0,0.5); }
+  #numbers .year-bar-wrap {
+    height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  #numbers .year-bar-wrap::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 1px;
+    background: rgba(255,255,255,0.15);
+  }
+  #numbers .year-card:nth-child(1) .year-bar-wrap { background: rgba(255,255,255,0.06); }
+  #numbers .year-bar {
+    height: 100%;
+    width: 0;
+    background: #e53935;
+    border-radius: 4px;
+    transition: width 1.4s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 0 8px rgba(229,57,53,0.4);
+  }
+  #numbers .year-bar.animated { }
+
+  /* ─── FOOTER CTA ─── */
+  #cta {
+    background: var(--black);
+    padding: 100px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    margin: 8px;
+  }
+  .cta-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 60% at 50% 100%, rgba(230,48,0,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px; height: 80px;
+    background: var(--yellow);
+    font-family: 'Unbounded', sans-serif;
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--black);
+    margin-bottom: 32px;
+  }
+  .cta-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: -2px;
+    line-height: 1.0;
+    margin-bottom: 16px;
+  }
+  .cta-title span { color: var(--yellow); }
+  .cta-sub {
+    font-size: 16px;
+    color: #555;
+    max-width: 500px;
+    margin: 0 auto 48px;
+    line-height: 1.6;
+  }
+  .cta-buttons {
+    display: flex;
+    gap: 0;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--yellow);
+    color: var(--black);
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 18px 40px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.5px;
+  }
+  .btn-primary:hover { background: #FFE033; transform: translateY(-2px); }
+  .btn-secondary {
+    background: transparent;
+    color: #555;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 18px 40px;
+    text-decoration: none;
+    display: inline-block;
+    border: 2px solid #222;
+    transition: border-color 0.2s, color 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn-secondary:hover { border-color: #555; color: #888; }
+
+  .cta-footer {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #333;
+  }
+  .cta-footer strong { color: var(--yellow); font-family: 'Unbounded', sans-serif; font-size: 16px; }
+
+  /* Responsive */
+  /* ═══ TABLET (≤900px) ═══ */
+  @media (max-width: 900px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+
+    /* Hero */
+    #hero { grid-template-columns: 1fr; padding: 90px 24px 52px; gap: 36px; }
+    .hero-right { display: none; }
+    .hero-title { font-size: clamp(32px, 7vw, 52px); }
+    .hero-sub { font-size: 15px; }
+    .hero-stat-num { font-size: 28px; }
+    .hero-stat-label { font-size: 9px; }
+    .hero-stats { gap: 0; }
+    .hero-stat { padding: 16px 20px; }
+
+    /* Sections */
+    #problem, #how, #value, #numbers { padding: 72px 24px; }
+    .section-title { font-size: clamp(24px, 5vw, 40px); margin-bottom: 40px; letter-spacing: -1px; }
+
+    /* Problem */
+    .problem-grid { grid-template-columns: 1fr; gap: 12px; }
+    .problem-card { padding: 32px 28px; border-radius: 16px; }
+    .problem-num { font-size: 48px; }
+
+    /* How (product) */
+    .how-layout { grid-template-columns: 1fr; }
+    .phone-wrap { display: none; }
+    .how-steps { max-width: 100%; }
+
+    /* Value */
+    .value-grid { grid-template-columns: 1fr; gap: 12px; }
+    .vc-big { font-size: 52px; }
+    .vc-top { padding: 32px 28px 24px; }
+    .vc-bottom { padding: 16px 28px; }
+
+    /* Numbers */
+    .market-size { grid-template-columns: 1fr; gap: 12px; }
+    .years-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .market-num { font-size: 36px; }
+    .year-share { font-size: 28px; }
+    .year-card { padding: 24px; border-radius: 14px; }
+    .market-big, .market-context { padding: 28px; border-radius: 14px; }
+    .ym-val { font-size: 13px; }
+
+    /* CTA / footer */
+    #cta { padding: 72px 24px; }
+    .cta-footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+
+  /* ═══ MOBILE (≤480px) ═══ */
+  @media (max-width: 480px) {
+    nav { padding: 0 16px; height: 52px; }
+    .nav-logo { font-size: 14px; }
+    .logo-icon { width: 22px; height: 22px; }
+
+    /* Hero */
+    #hero { padding: 72px 16px 44px; gap: 28px; }
+    .hero-title { font-size: clamp(28px, 9vw, 40px); letter-spacing: -1px; }
+    .hero-sub { font-size: 13px; margin-bottom: 28px; }
+    .section-label { font-size: 9px; letter-spacing: 2px; margin-bottom: 20px; }
+    .hero-stats { flex-direction: row; flex-wrap: wrap; gap: 1px; }
+    .hero-stat { padding: 14px 16px; flex: 1; min-width: 120px; }
+    .hero-stat-num { font-size: 24px; }
+    .hero-badge { font-size: 9px; padding: 6px 12px; }
+
+    /* Sections */
+    #problem, #how, #value, #numbers { padding: 56px 16px; }
+    .section-title { font-size: clamp(22px, 7vw, 32px); margin-bottom: 32px; letter-spacing: -0.5px; }
+
+    /* Problem */
+    .problem-grid { gap: 10px; }
+    .problem-card { padding: 28px 24px; border-radius: 14px; }
+    .problem-num { font-size: 40px; margin-bottom: 12px; }
+    .problem-card h3 { font-size: 14px; }
+    .problem-card p { font-size: 13px; }
+
+    /* Value cards */
+    .vc-big { font-size: 44px; }
+    .vc-top { padding: 28px 24px 20px; }
+    .vc-bottom { padding: 14px 24px; }
+    .vc-title { font-size: 13px; }
+    .vc-points li { font-size: 12px; }
+
+    /* Numbers */
+    .years-grid { grid-template-columns: 1fr; gap: 10px; }
+    .market-big, .market-context { padding: 24px; }
+    .market-label { font-size: 9px; }
+    .market-num { font-size: 30px; }
+    .market-sub { font-size: 11px; }
+    .year-card { padding: 20px; }
+    .year-share { font-size: 26px; }
+    .year-rev { font-size: 11px; }
+    .year-label { font-size: 10px; letter-spacing: 1.5px; }
+    .ym-val { font-size: 12px; }
+    .ym-key { font-size: 9px; }
+    .year-metrics-label { font-size: 8px; margin-top: 14px; margin-bottom: 8px; }
+
+    /* How steps */
+    .step { padding: 20px 0; }
+    .step-num { font-size: 28px; }
+    .step-title { font-size: 14px; }
+
+    /* CTA */
+    #cta { padding: 56px 16px; }
+  }
+
+  .year-metrics-label {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  .year-metrics {
+    display: flex;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .ym-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+  }
+  .ym-val {
+    font-size: 15px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: -0.5px;
+  }
+  .year-card:nth-child(4) .ym-val { color: rgba(255,215,0,0.8); }
+  .ym-key {
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .interactive-hall {
+    position: relative;
+    flex: 1;
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 10px 8px 8px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .hall-stage {
+    background: #ddd;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 8px;
+    font-weight: 700;
+    color: #888;
+    letter-spacing: 2px;
+    padding: 4px 0;
+    margin-bottom: 8px;
+  }
+  .hall-section {
+    margin-bottom: 6px;
+  }
+  .hall-section-label {
+    font-size: 7px;
+    font-weight: 700;
+    color: #aaa;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .hall-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .hall-row {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+  }
+  .hseat {
+    width: 10px;
+    height: 8px;
+    border-radius: 1px;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
+    flex-shrink: 0;
+  }
+  .hseat.free { background: #4A3FC7; }
+  .hseat.taken { background: #ddd; cursor: default; }
+  .hseat.free:hover { background: #FF6B35; transform: scale(1.3); }
+  .hall-tooltip {
+    position: absolute;
+    background: white;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 9px;
+    font-weight: 600;
+    color: #111;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    pointer-events: none;
+    display: none;
+    z-index: 10;
+    white-space: nowrap;
+  }
+
+  .nav-logo-text {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: 16px;
+    color: var(--white);
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+  .nav-x {
+    color: var(--yellow);
+    font-weight: 900;
+  }
+
+  @media (max-width: 480px) {
+    #hero, #problem, #how, #value, #numbers, #cta {
+      margin: 4px;
+      border-radius: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-avito-watermark {
+      width: 85%;
+      right: -15%;
+      bottom: -5%;
+      opacity: 1;
+    }
+  }
+  @media (max-width: 900px) and (min-width: 481px) {
+    .hero-avito-watermark {
+      width: 70%;
+      right: -10%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo-text">PortalBilet&nbsp;<span class="nav-x">×</span>&nbsp;Avito</div>
+  <ul class="nav-links">
+    <li><a href="#problem">Проблема</a></li>
+    <li><a href="#how">Продукт</a></li>
+    <li><a href="#value">Выгода</a></li>
+    <li><a href="#numbers">Цифры</a></li>
+  </ul>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+  <div class="hero-avito-watermark">
+    <svg viewBox="0 0 371 355" xmlns="http://www.w3.org/2000/svg">
+      <path d="M307.709 136.691C302.449 148.248 295.322 158.742 286.665 167.799C314.356 179.691 333.817 207.268 333.817 239.327C333.817 282.217 299.002 317.109 256.219 317.109C256.219 317.109 58.1147 317.013 57.8791 317.013V303.253C71.0925 303.253 81.8052 292.518 81.8052 279.276C81.8052 266.031 71.0925 255.295 57.8791 255.295V241.5C71.0925 241.5 81.8052 230.762 81.8052 217.52C81.8052 204.277 71.0925 193.542 57.8791 193.542V179.78C58.1891 179.78 205.807 179.712 205.807 179.712C255.057 179.712 295.127 139.556 295.127 90.1831C295.127 40.8213 255.057 0.663574 205.807 0.663574H174.404V124.391H211.55V38.2034C237.624 41.0801 257.982 63.2891 257.982 90.1831C257.982 119.018 234.578 142.484 205.807 142.484L24.0502 142.453V155.801H23.9614C23.9614 169.042 13.2507 179.78 0.037384 179.78V193.542C13.2507 193.542 23.9614 204.277 23.9614 217.52C23.9614 230.762 13.2507 241.5 0.037384 241.5V255.295C13.2507 255.295 23.9614 266.031 23.9614 279.276C23.9614 292.518 13.2507 303.253 0.037384 303.253V317.013C13.2403 317.013 23.9407 327.73 23.9594 340.959H24.0502V354.308L256.219 354.336C319.493 354.336 370.963 302.742 370.963 239.327C370.963 194.478 345.162 155.644 307.709 136.691Z" fill="rgba(0,0,0,0.13)"/>
+    </svg>
+  </div>
+
+  <div class="hero-left">
+    <div class="hero-tag reveal">
+      <span class="hero-tag-dot"></span>
+      Партнёрское предложение · 2026
+    </div>
+    <h1 class="hero-title reveal reveal-delay-1">
+      Первичный<br>
+      и вторичный рынок —<br>
+      <span class="accent">в одном месте.</span>
+    </h1>
+    <p class="hero-sub reveal reveal-delay-2">
+      PortalBilet — единственный маркетплейс России с билетами от организаторов и от проверенных перепродавцов одновременно. Крупнейшая доля вторичного рынка и наибольшее число продавцов-брокеров в стране.
+    </p>
+    <div class="hero-stats reveal reveal-delay-3">
+      <div class="hero-stat">
+        <span class="hero-stat-num">48 176</span>
+        <span class="hero-stat-label">билетов продано в 2025</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">#1</span>
+        <span class="hero-stat-label">по числу брокеров на вторичном рынке РФ</span>
+      </div>
+      <div class="hero-stat" style="background:#111; border-radius: 0 16px 16px 0;">
+        <span class="hero-stat-num" style="color:var(--white)">1+2</span>
+        <span class="hero-stat-label">первичный + вторичный рынок</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right reveal reveal-delay-2">
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <span class="search-text">Куда сходить сегодня?</span>
+      <div class="search-cursor"></div>
+    </div>
+
+    <div class="ticket-stack">
+      <div class="ticket">
+        <div class="ticket-body">
+          <div class="ticket-name">Imagine Dragons</div>
+          <div class="ticket-date">29 мая 2026 · 20:00 · Лужники</div>
+        </div>
+        <div class="ticket-stub"><div class="ticket-logo">В</div></div>
+      </div>
+      <div class="ticket">
+        <div class="ticket-body">
+          <div class="ticket-name">Лебединое озеро · Большой</div>
+          <div class="ticket-date">18 апреля 2026 · 19:00 · Москва</div>
+        </div>
+        <div class="ticket-stub"><div class="ticket-logo">В</div></div>
+      </div>
+      <div class="ticket">
+        <div class="ticket-body">
+          <div class="ticket-name">Кабала Святош · МХТ Чехова</div>
+          <div class="ticket-date">4 апреля 2026 · 19:00 · Москва</div>
+        </div>
+        <div class="ticket-stub"><div class="ticket-logo">В</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PROBLEM ─── -->
+<section id="problem">
+  <div class="section-label reveal">01 — Проблема</div>
+  <h2 class="section-title reveal reveal-delay-1">
+    У Авито есть билеты.<br>
+    <span class="yellow">Но нет решения.</span>
+  </h2>
+  <div class="problem-grid">
+    <div class="problem-card reveal reveal-delay-1">
+      <span class="problem-num">20%</span>
+      <h3>Серая перепродажа</h3>
+      <p>Каждый пятый билет на Авито — перекуп без гарантий. Продавцы продают фейковые и аннулированные билеты реальным людям. Авито не хочет с этим связываться, но проблема уже внутри платформы.</p>
+    </div>
+    <div class="problem-card reveal reveal-delay-2">
+      <span class="problem-num" style="color:#e53935;">0</span>
+      <h3>Верификации нет</h3>
+      <p>Ни одного инструмента проверки подлинности. Авито не может подтвердить продавца, билет или мероприятие — а мы умеем это делать.</p>
+    </div>
+    <div class="problem-card reveal reveal-delay-3">
+      <span class="problem-num" style="color:#555;">→</span>
+      <h3>Пользователи уходят</h3>
+      <p>Аудитория уходит на серые сайты перекупов в поисках билетов, которых нет на официальных площадках. Трафик Авито не конвертируется в продажи — деньги уходят мимо платформы.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW ─── -->
+<section id="how">
+  <div class="section-label reveal">02 — Продукт</div>
+  <h2 class="section-title reveal reveal-delay-1">
+    Рекламный виджет<br>
+    <span class="yellow">нового поколения.</span>
+  </h2>
+
+  <div class="how-layout">
+    <div class="steps">
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Виджет под стандарты маркетплейсов</h3>
+          <p>Виджет PortalBilet специально разработан под лучшие стандарты билетных маркетплейсов: выводит несколько предложений сразу, поддерживает стоячие секторы и зоны (pit, fanzone) — такого решения в России нет ни у кого.</p>
+          <span class="step-badge">Уникальная технология для РФ</span>
+        </div>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Первичный + вторичный в одном экране</h3>
+          <p>Виджет одновременно показывает билеты от организаторов и от проверенных перепродавцов. Там, где официальные билеты закончились — у нас они есть. Покупатель видит все варианты и выбирает лучшее предложение.</p>
+          <span class="step-badge">Самое насыщенное предложение</span>
+        </div>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Интегрируем в раздел «Авито Билеты»</h3>
+          <p>Берём на себя весь раздел вторичных продаж на Авито: проверяем продавцов, верифицируем билеты методами, отточенными на мировом рынке перепродажи. Авито не касается серого рынка — мы делаем его белым.</p>
+          <span class="step-badge">Авито остаётся чистым</span>
+        </div>
+      </div>
+    </div>
+
+        <div class="phone-wrap reveal reveal-delay-2">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="phone-header">
+            <span class="phone-header-logo">Авито</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </div>
+          <div class="phone-content">
+            <div class="phone-event-title">Кабала Святош · МХТ Чехова</div>
+            <div class="phone-event-meta">4 апреля 2026 · 19:00 · Москва</div>
+            <div class="interactive-hall">
+              <div class="hall-stage">СЦЕНА</div>
+              <div class="hall-section" id="hall-parket">
+                <div class="hall-section-label">Партер</div>
+                <div class="hall-rows" id="rows-parket"></div>
+              </div>
+              <div class="hall-section" id="hall-balkon">
+                <div class="hall-section-label">Балкон</div>
+                <div class="hall-rows" id="rows-balkon"></div>
+              </div>
+              <div class="hall-tooltip" id="hall-tooltip"></div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── VALUE ─── -->
+<section id="value">
+  <div class="section-label reveal">03 — Что получает Авито</div>
+  <h2 class="section-title reveal reveal-delay-1">
+    Три причины<br><span class="yellow">работать с нами.</span>
+  </h2>
+  <div class="value-grid">
+    <div class="value-card reveal reveal-delay-1">
+      <div class="vc-top">
+        <span class="vc-icon">🗂️</span>
+        <span class="vc-label">Афиша</span>
+        <span class="vc-big" style="font-size:52px;letter-spacing:-1px">1+2<br>рынок</span>
+        <div class="vc-title">Самое широкое предложение</div>
+        <ul class="vc-points">
+          <li>Билеты от организаторов и от проверенных перепродавцов — в одном месте</li>
+          <li>На события, где все билеты проданы — у нас они есть через вторичный рынок</li>
+          <li>Авито становится самой полной афишей страны</li>
+        </ul>
+      </div>
+      <div class="vc-bottom"><span>806 мероприятий · 107 верифицированных брокеров</span></div>
+    </div>
+    <div class="value-card reveal reveal-delay-2">
+      <div class="vc-top">
+        <span class="vc-icon">🔌</span>
+        <span class="vc-label">Интеграция</span>
+        <span class="vc-big" style="font-size:60px">1 тег</span>
+        <div class="vc-title">Готовый виджет. Несложная интеграция.</div>
+        <ul class="vc-points">
+          <li>Готовый рекламный виджет с несложной интеграцией в любой сайт и приложение</li>
+          <li>Постоянно улучшается под потребности вторичного рынка — стоячие секторы, мультипредложение, фильтры</li>
+          <li>Масштабируется на весь трафик Авито без дополнительных ресурсов</li>
+        </ul>
+      </div>
+      <div class="vc-bottom"><span>Живой продукт, который растёт вместе с рынком</span></div>
+    </div>
+    <div class="value-card reveal reveal-delay-3">
+      <div class="vc-top">
+        <span class="vc-icon">🛡️</span>
+        <span class="vc-label">Безопасность</span>
+        <span class="vc-big" style="font-size:52px;letter-spacing:-1px">Белый<br>рынок</span>
+        <div class="vc-title">АВБР — отраслевой стандарт честности</div>
+        <ul class="vc-points">
+          <li>PortalBilet — фаундер АВБР (Ассоциация вторичного билетного рынка), объединяющей брокеров по всей России</li>
+          <li>АВБР защищает права брокеров, но жёстко следит за их добросовестностью по отношению к покупателям</li>
+          <li>Авито подключается к уже работающей системе стандартов — не создаёт с нуля</li>
+        </ul>
+      </div>
+      <div class="vc-bottom"><span>107 брокеров прошли верификацию АВБР · Серый рынок под контролем</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── NUMBERS ─── -->
+<section id="numbers">
+  <div class="section-label reveal">04 — Рост</div>
+  <h2 class="section-title reveal reveal-delay-1">
+    Мы растём ×2 каждый год.<br><span class="yellow">С Авито — быстрее.</span>
+  </h2>
+
+  <div class="market-size reveal reveal-delay-1">
+    <div class="market-big">
+      <div class="market-label">Вторичный рынок РФ — GMV 2025</div>
+      <div class="market-num">~9B ₽</div>
+      <div class="market-sub">Рост рынка +17%/год (OKS Labs) · к году 3 рынок ~14.4B ₽</div>
+    </div>
+    <div class="market-context">
+      <div class="market-label">Наш GMV сейчас</div>
+      <div class="market-num">~1.5B ₽</div>
+      <div class="market-sub">Вторичный + первичный рынок · план на 2026 — 2B ₽</div>
+    </div>
+  </div>
+
+  <div class="years-grid reveal reveal-delay-2">
+    <div class="year-card">
+      <div class="year-label">Сейчас</div>
+      <div class="year-share">1.5B</div>
+      <div class="year-rev">~17% вторичного рынка · рынок ~9B ₽<br><span style="color:rgba(255,255,255,0.3);font-size:11px;">вторичный + первичный рынок</span></div>
+      <div class="year-bar-wrap"><div class="year-bar" data-width="17"></div></div>
+      <div class="year-metrics-label">Вторичный рынок</div>
+      <div class="year-metrics">
+        <div class="ym-item"><span class="ym-val">48к</span><span class="ym-key">билетов</span></div>
+        <div class="ym-item"><span class="ym-val">806</span><span class="ym-key">мероприятий</span></div>
+        <div class="ym-item"><span class="ym-val">107</span><span class="ym-key">брокеров</span></div>
+      </div>
+    </div>
+    <div class="year-card">
+      <div class="year-label">2026</div>
+      <div class="year-share">2B</div>
+      <div class="year-rev">~19% · рынок ~10.5B ₽</div>
+      <div class="year-bar-wrap"><div class="year-bar" data-width="19"></div></div>
+      <div class="year-metrics-label">Вторичный рынок</div>
+      <div class="year-metrics">
+        <div class="ym-item"><span class="ym-val">~96к</span><span class="ym-key">билетов</span></div>
+        <div class="ym-item"><span class="ym-val">~1 200</span><span class="ym-key">мероприятий</span></div>
+        <div class="ym-item"><span class="ym-val">~140</span><span class="ym-key">брокеров</span></div>
+      </div>
+    </div>
+    <div class="year-card">
+      <div class="year-label">2027</div>
+      <div class="year-share">3B</div>
+      <div class="year-rev">~24% · рынок ~12.3B ₽</div>
+      <div class="year-bar-wrap"><div class="year-bar" data-width="24"></div></div>
+      <div class="year-metrics-label">Вторичный рынок</div>
+      <div class="year-metrics">
+        <div class="ym-item"><span class="ym-val">~192к</span><span class="ym-key">билетов</span></div>
+        <div class="ym-item"><span class="ym-val">~1 800</span><span class="ym-key">мероприятий</span></div>
+        <div class="ym-item"><span class="ym-val">~180</span><span class="ym-key">брокеров</span></div>
+      </div>
+    </div>
+    <div class="year-card">
+      <div class="year-label">2028</div>
+      <div class="year-share" style="color:var(--yellow)">4.5B</div>
+      <div class="year-rev">~31% · рынок ~14.4B ₽</div>
+      <div class="year-bar-wrap"><div class="year-bar" data-width="31"></div></div>
+      <div class="year-metrics-label">Вторичный рынок</div>
+      <div class="year-metrics">
+        <div class="ym-item"><span class="ym-val">~384к</span><span class="ym-key">билетов</span></div>
+        <div class="ym-item"><span class="ym-val">~2 700</span><span class="ym-key">мероприятий</span></div>
+        <div class="ym-item"><span class="ym-val">~235</span><span class="ym-key">брокеров</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<script>
+  // Animate bars when numbers section comes into view
+  const bars = document.querySelectorAll('#numbers .year-bar');
+  
+  const animateBars = () => {
+    bars.forEach((bar, i) => {
+      setTimeout(() => {
+        const w = bar.dataset.width || 0;
+        bar.style.width = w + '%';
+      }, i * 250);
+    });
+  };
+
+  const numbersSection = document.getElementById('numbers');
+  if (numbersSection) {
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        animateBars();
+        obs.unobserve(numbersSection);
+      }
+    }, { threshold: 0.2 });
+    obs.observe(numbersSection);
+  }
+  // Fallback: animate after 500ms anyway
+  setTimeout(animateBars, 500);
+</script>
+
+<script>
+  // Interactive hall
+  const prices = [18800, 19500, 21800, 24800, 25200, 28500];
+  const sections = [
+    { id: 'rows-parket', rows: 6, seatsPerRow: 16, takenPct: 0.3, label: 'Партер' },
+    { id: 'rows-balkon', rows: 3, seatsPerRow: 12, takenPct: 0.5, label: 'Балкон' }
+  ];
+  
+  sections.forEach(sec => {
+    const container = document.getElementById(sec.id);
+    if (!container) return;
+    for (let r = 0; r < sec.rows; r++) {
+      const row = document.createElement('div');
+      row.className = 'hall-row';
+      for (let s = 0; s < sec.seatsPerRow; s++) {
+        const seat = document.createElement('div');
+        const isTaken = Math.random() < sec.takenPct;
+        seat.className = 'hseat ' + (isTaken ? 'taken' : 'free');
+        if (!isTaken) {
+          const price = prices[Math.floor(Math.random() * prices.length)];
+          const rowNum = sec.rows - r;
+          const seatNum = s + 1;
+          seat.dataset.price = price;
+          seat.dataset.info = `${sec.label} · Ряд ${rowNum}, Место ${seatNum}`;
+          seat.addEventListener('mouseenter', (e) => {
+            const tip = document.getElementById('hall-tooltip');
+            tip.innerHTML = `<strong>${price.toLocaleString('ru')} ₽</strong><br>${sec.label} · Ряд ${rowNum}, М. ${seatNum}`;
+            tip.style.display = 'block';
+            const rect = seat.getBoundingClientRect();
+            const hall = seat.closest('.interactive-hall').getBoundingClientRect();
+            let left = rect.left - hall.left + 12;
+            let top = rect.top - hall.top - 36;
+            if (left + 100 > hall.width) left = left - 90;
+            tip.style.left = left + 'px';
+            tip.style.top = top + 'px';
+          });
+          seat.addEventListener('mouseleave', () => {
+            document.getElementById('hall-tooltip').style.display = 'none';
+          });
+        }
+        row.appendChild(seat);
+      }
+      container.appendChild(row);
+    }
+  });
+</script>
+</body>
+</html>
